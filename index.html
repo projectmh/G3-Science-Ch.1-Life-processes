@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>G3 Ch.1 Life processes</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        .font-game {
+            font-family: 'Fredoka One', cursive;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 2.5s ease-in-out infinite;
+        }
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+        .animate-wiggle {
+            animation: wiggle 0.4s ease-in-out;
+        }
+        @keyframes pop {
+            0% { transform: scale(0.88); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 4px solid rgba(255, 255, 255, 0.9);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+        .dragging {
+            opacity: 0.5;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-sky-300 via-teal-100 to-amber-100 min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden">
+
+    <!-- TOP HEADER / NAV BAR -->
+    <header class="w-full max-w-5xl mx-auto p-4 flex justify-between items-center z-30">
+        <!-- Home / Main Title -->
+        <button onclick="showHub()" class="flex items-center space-x-2 bg-white/90 px-4 py-2 rounded-full shadow-lg border-2 border-emerald-400 hover:scale-105 active:scale-95 transition">
+            <span class="text-3xl animate-bounce">🌿</span>
+            <span class="font-game text-xl md:text-2xl text-emerald-600 tracking-wide">G3 Ch.1 Life processes</span>
+        </button>
+
+        <!-- Right Controls (Stars & Sound Toggles) -->
+        <div class="flex items-center space-x-3">
+            <div class="bg-amber-300 border-2 border-amber-500 rounded-full px-4 py-1.5 flex items-center space-x-2 shadow-md">
+                <i class="fa-solid fa-star text-amber-600 text-xl animate-pulse"></i>
+                <span id="star-count" class="font-game text-xl text-amber-900">0</span>
+            </div>
+            
+            <button id="btn-music" onclick="toggleMusic()" class="w-12 h-12 bg-white rounded-full shadow-md border-2 border-sky-400 flex items-center justify-center text-sky-600 hover:bg-sky-50 active:scale-95 transition" title="Toggle Music">
+                <i id="icon-music" class="fa-solid fa-music text-lg"></i>
+            </button>
+            <button id="btn-sound" onclick="toggleSound()" class="w-12 h-12 bg-white rounded-full shadow-md border-2 border-emerald-400 flex items-center justify-center text-emerald-600 hover:bg-emerald-50 active:scale-95 transition" title="Toggle Sound FX">
+                <i id="icon-sound" class="fa-solid fa-volume-high text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="w-full max-w-4xl mx-auto px-4 flex-grow flex flex-col justify-center items-center my-3 relative">
+
+        <!-- ================= MAIN HUB / GAME SELECTOR ================= -->
+        <div id="screen-hub" class="w-full flex flex-col items-center text-center space-y-6 py-4 animate-pop">
+            
+            <!-- Mascot Header -->
+            <div class="flex items-center justify-center space-x-4 bg-white/80 p-4 rounded-3xl border-4 border-amber-300 shadow-xl max-w-lg w-full">
+                <div class="w-20 h-20 bg-emerald-400 rounded-full flex items-center justify-center text-4xl shadow-inner animate-float border-2 border-white">
+                    🦉
+                </div>
+                <div class="text-left">
+                    <div class="font-game text-sm text-amber-600 uppercase tracking-wider">Grade 3 Science Explorer</div>
+                    <h1 class="font-game text-2xl md:text-3xl text-slate-800">G3 Ch.1 Life processes</h1>
+                    <p class="text-xs md:text-sm font-semibold text-slate-500">Select a game mode • 10 Questions per round!</p>
+                </div>
+            </div>
+
+            <!-- 4 Game Selection Cards -->
+            <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-5">
+                
+                <!-- Game 1 Card -->
+                <button onclick="startQuizGame()" class="group glass-card rounded-3xl p-6 text-left shadow-xl hover:shadow-2xl border-b-8 border-amber-400 hover:border-amber-500 active:scale-98 transition duration-200 flex flex-col justify-between space-y-4">
+                    <div class="flex justify-between items-start">
+                        <span class="w-14 h-14 bg-amber-400 text-white text-3xl rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition">❓</span>
+                        <span class="bg-amber-100 text-amber-800 font-game text-xs px-3 py-1 rounded-full border border-amber-300">10 Qs / Round</span>
+                    </div>
+                    <div>
+                        <h2 class="font-game text-xl md:text-2xl text-slate-800 group-hover:text-amber-600 transition">Multiple Choice Quiz</h2>
+                        <p class="text-sm text-slate-600 mt-1">Light, high-contrast cards with simple choices!</p>
+                    </div>
+                    <div class="w-full bg-amber-500 text-white font-game text-center py-2.5 rounded-xl shadow group-hover:bg-amber-600 transition">
+                        PLAY QUIZ <i class="fa-solid fa-play ml-1"></i>
+                    </div>
+                </button>
+
+                <!-- Game 2 Card -->
+                <button onclick="startTFGame()" class="group glass-card rounded-3xl p-6 text-left shadow-xl hover:shadow-2xl border-b-8 border-emerald-400 hover:border-emerald-500 active:scale-98 transition duration-200 flex flex-col justify-between space-y-4">
+                    <div class="flex justify-between items-start">
+                        <span class="w-14 h-14 bg-emerald-400 text-white text-3xl rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition">👍</span>
+                        <span class="bg-emerald-100 text-emerald-800 font-game text-xs px-3 py-1 rounded-full border border-emerald-300">10 Qs / Round</span>
+                    </div>
+                    <div>
+                        <h2 class="font-game text-xl md:text-2xl text-slate-800 group-hover:text-emerald-600 transition">True or False</h2>
+                        <p class="text-sm text-slate-600 mt-1">Decide if science statements are True or False!</p>
+                    </div>
+                    <div class="w-full bg-emerald-500 text-white font-game text-center py-2.5 rounded-xl shadow group-hover:bg-emerald-600 transition">
+                        PLAY T/F <i class="fa-solid fa-play ml-1"></i>
+                    </div>
+                </button>
+
+                <!-- Game 3 Card -->
+                <button onclick="startSortGame()" class="group glass-card rounded-3xl p-6 text-left shadow-xl hover:shadow-2xl border-b-8 border-sky-400 hover:border-sky-500 active:scale-98 transition duration-200 flex flex-col justify-between space-y-4">
+                    <div class="flex justify-between items-start">
+                        <span class="w-14 h-14 bg-sky-400 text-white text-3xl rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition">📦</span>
+                        <span class="bg-sky-100 text-sky-800 font-game text-xs px-3 py-1 rounded-full border border-sky-300">10 Words / Round</span>
+                    </div>
+                    <div>
+                        <h2 class="font-game text-xl md:text-2xl text-slate-800 group-hover:text-sky-600 transition">Sort into Boxes</h2>
+                        <p class="text-sm text-slate-600 mt-1">Sort 10 items into Living and Non-Living boxes!</p>
+                    </div>
+                    <div class="w-full bg-sky-500 text-white font-game text-center py-2.5 rounded-xl shadow group-hover:bg-sky-600 transition">
+                        PLAY SORTING <i class="fa-solid fa-play ml-1"></i>
+                    </div>
+                </button>
+
+                <!-- Game 4 Card -->
+                <button onclick="startBlankGame()" class="group glass-card rounded-3xl p-6 text-left shadow-xl hover:shadow-2xl border-b-8 border-purple-400 hover:border-purple-500 active:scale-98 transition duration-200 flex flex-col justify-between space-y-4">
+                    <div class="flex justify-between items-start">
+                        <span class="w-14 h-14 bg-purple-400 text-white text-3xl rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition">🧩</span>
+                        <span class="bg-purple-100 text-purple-800 font-game text-xs px-3 py-1 rounded-full border border-purple-300">10 Qs / Round</span>
+                    </div>
+                    <div>
+                        <h2 class="font-game text-xl md:text-2xl text-slate-800 group-hover:text-purple-600 transition">Fill-in-the-Blank</h2>
+                        <p class="text-sm text-slate-600 mt-1">Tap word chips to complete key life process facts!</p>
+                    </div>
+                    <div class="w-full bg-purple-500 text-white font-game text-center py-2.5 rounded-xl shadow group-hover:bg-purple-600 transition">
+                        PLAY BLANKS <i class="fa-solid fa-play ml-1"></i>
+                    </div>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- ================= COMMON GAME CONTAINER ================= -->
+        <div id="screen-game" class="w-full hidden flex-col items-center">
+            
+            <!-- Game Top Status Bar -->
+            <div class="w-full glass-card rounded-2xl p-4 mb-4 shadow-md flex items-center justify-between">
+                <button onclick="showHub()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-game text-xs md:text-sm px-3 py-1.5 rounded-xl transition flex items-center space-x-1">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Hub</span>
+                </button>
+
+                <div class="flex items-center space-x-2">
+                    <span id="game-title-badge" class="bg-emerald-500 text-white font-game text-xs md:text-sm px-3 py-1 rounded-full shadow">
+                        Quiz Mode
+                    </span>
+                    <span id="question-tracker" class="font-game text-slate-600 text-sm md:text-base">
+                        1 / 10
+                    </span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-24 md:w-36 bg-slate-200 h-3 rounded-full overflow-hidden border border-slate-300">
+                    <div id="game-progress-bar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <!-- GAME 1 CONTAINER: MULTIPLE CHOICE -->
+            <div id="game-mc-view" class="w-full glass-card rounded-3xl p-6 shadow-xl flex flex-col items-center space-y-6 animate-pop hidden">
+                <div class="w-full text-center space-y-2">
+                    <h3 id="mc-question-text" class="font-game text-xl md:text-2xl text-slate-800 leading-snug">
+                        Loading...
+                    </h3>
+                </div>
+
+                <div id="mc-options-grid" class="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Option Buttons -->
+                </div>
+
+                <!-- Explicit Next Button -->
+                <div id="mc-feedback-area" class="w-full hidden flex-col items-center pt-2">
+                    <button id="btn-mc-next" onclick="nextMCQuestion()" class="bg-amber-500 hover:bg-amber-600 text-white font-game text-lg px-8 py-3 rounded-2xl shadow-lg border-b-4 border-amber-700 active:scale-95 transition animate-bounce flex items-center space-x-2">
+                        <span>Next Question</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- GAME 2 CONTAINER: TRUE / FALSE -->
+            <div id="game-tf-view" class="w-full glass-card rounded-3xl p-6 shadow-xl flex flex-col items-center space-y-6 animate-pop hidden">
+                <div class="w-full text-center space-y-2">
+                    <h3 id="tf-question-text" class="font-game text-xl md:text-2xl text-slate-800 leading-snug">
+                        Loading...
+                    </h3>
+                </div>
+
+                <div id="tf-buttons-grid" class="w-full grid grid-cols-2 gap-6 max-w-lg">
+                    <button id="btn-tf-true" onclick="checkTFAnswer(true)" class="bg-emerald-500 hover:bg-emerald-600 text-white font-game text-2xl md:text-3xl py-8 rounded-3xl shadow-lg border-b-8 border-emerald-700 active:scale-95 transition flex flex-col items-center justify-center space-y-2 relative overflow-hidden">
+                        <span id="badge-tf-true" class="hidden text-xl font-bold bg-white px-2 py-0.5 rounded-full shadow my-1"></span>
+                        <span class="text-4xl">👍</span>
+                        <span>TRUE</span>
+                    </button>
+                    <button id="btn-tf-false" onclick="checkTFAnswer(false)" class="bg-rose-500 hover:bg-rose-600 text-white font-game text-2xl md:text-3xl py-8 rounded-3xl shadow-lg border-b-8 border-rose-700 active:scale-95 transition flex flex-col items-center justify-center space-y-2 relative overflow-hidden">
+                        <span id="badge-tf-false" class="hidden text-xl font-bold bg-white px-2 py-0.5 rounded-full shadow my-1"></span>
+                        <span class="text-4xl">👎</span>
+                        <span>FALSE</span>
+                    </button>
+                </div>
+
+                <!-- Explicit Next Button -->
+                <div id="tf-feedback-area" class="w-full hidden flex-col items-center pt-2">
+                    <button id="btn-tf-next" onclick="nextTFQuestion()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-game text-lg px-8 py-3 rounded-2xl shadow-lg border-b-4 border-emerald-700 active:scale-95 transition animate-bounce flex items-center space-x-2">
+                        <span>Next Question</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- GAME 3 CONTAINER: SORT INTO BOXES -->
+            <div id="game-sort-view" class="w-full glass-card rounded-3xl p-4 md:p-6 shadow-xl flex flex-col items-center space-y-4 animate-pop hidden">
+                <div class="text-center">
+                    <h3 class="font-game text-lg md:text-xl text-slate-800">
+                        Sort 10 Cards into Living or Non-Living! 📦
+                    </h3>
+                    <p class="text-xs md:text-sm font-semibold text-slate-500">Sorted: <span id="sort-progress-text">0 / 10</span></p>
+                </div>
+
+                <!-- Card Pool Area -->
+                <div id="sort-card-pool" class="w-full bg-slate-100/90 border-2 border-dashed border-slate-300 rounded-2xl p-4 min-h-[90px] flex flex-wrap justify-center items-center gap-2.5">
+                    <!-- Cards -->
+                </div>
+
+                <!-- Drop Zones -->
+                <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Living Zone -->
+                    <div id="zone-living" 
+                         ondragover="allowSortDrop(event)" 
+                         ondrop="handleSortDrop(event, 'living')"
+                         onclick="handleZoneTap('living')"
+                         class="bg-emerald-50 border-4 border-emerald-400 border-dashed rounded-3xl p-4 min-h-[170px] flex flex-col items-center transition">
+                        <div class="bg-emerald-500 text-white font-game text-base px-4 py-1 rounded-full shadow mb-2">
+                            🌱 Living Things
+                        </div>
+                        <div id="living-box-list" class="w-full flex flex-wrap justify-center gap-2"></div>
+                    </div>
+
+                    <!-- Non-Living Zone -->
+                    <div id="zone-nonliving" 
+                         ondragover="allowSortDrop(event)" 
+                         ondrop="handleSortDrop(event, 'nonliving')"
+                         onclick="handleZoneTap('nonliving')"
+                         class="bg-amber-50 border-4 border-amber-400 border-dashed rounded-3xl p-4 min-h-[170px] flex flex-col items-center transition">
+                        <div class="bg-amber-500 text-white font-game text-base px-4 py-1 rounded-full shadow mb-2">
+                            🪨 Non-Living Things
+                        </div>
+                        <div id="nonliving-box-list" class="w-full flex flex-wrap justify-center gap-2"></div>
+                    </div>
+                </div>
+
+                <div id="sort-action-area" class="w-full flex flex-col items-center space-y-3">
+                    <button id="btn-sort-check" onclick="checkSortRound()" class="hidden bg-sky-500 hover:bg-sky-600 text-white font-game text-lg px-8 py-3 rounded-2xl shadow-lg border-b-4 border-sky-700 active:scale-95 transition animate-bounce">
+                        Check Answers! ✨
+                    </button>
+
+                    <button id="btn-sort-next" onclick="triggerCelebration()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white font-game text-lg px-8 py-3 rounded-2xl shadow-lg border-b-4 border-emerald-700 active:scale-95 transition animate-bounce flex items-center space-x-2">
+                        <span>Finish Stage</span>
+                        <i class="fa-solid fa-trophy"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- GAME 4 CONTAINER: FILL IN THE BLANK -->
+            <div id="game-blank-view" class="w-full glass-card rounded-3xl p-6 shadow-xl flex flex-col items-center space-y-6 animate-pop hidden">
+                <div class="w-full text-center">
+                    <h3 class="font-game text-xl md:text-2xl text-slate-800">
+                        Select the correct word for the blank! 🧩
+                    </h3>
+                </div>
+
+                <!-- Sentence Display -->
+                <div id="blank-sentence-box" class="bg-amber-50/90 border-2 border-amber-200 rounded-2xl p-6 text-xl md:text-2xl font-bold text-slate-700 text-center leading-relaxed max-w-2xl w-full">
+                    <!-- Blank sentence injected -->
+                </div>
+
+                <!-- Word Choice Buttons -->
+                <div id="blank-word-bank" class="flex flex-wrap justify-center gap-3">
+                    <!-- Word choice buttons -->
+                </div>
+
+                <!-- Explicit Next Button -->
+                <div id="blank-feedback-area" class="w-full hidden flex-col items-center pt-2">
+                    <button id="btn-blank-next" onclick="nextBlankQuestion()" class="bg-purple-500 hover:bg-purple-600 text-white font-game text-lg px-8 py-3 rounded-2xl shadow-lg border-b-4 border-purple-700 active:scale-95 transition animate-bounce flex items-center space-x-2">
+                        <span>Next Question</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= CELEBRATION & REVIEW MODAL SCREEN ================= -->
+        <div id="screen-celebrate" class="w-full glass-card rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col items-center text-center space-y-6 hidden animate-pop">
+            <div class="space-y-1">
+                <h2 class="font-game text-3xl md:text-5xl text-emerald-600">
+                    STAGE COMPLETE! 🎉
+                </h2>
+                <p id="celebrate-subtitle" class="font-semibold text-base md:text-lg text-slate-600">
+                    Fantastic work scientist! Here is your summary:
+                </p>
+            </div>
+
+            <!-- Score Summary Cards -->
+            <div class="grid grid-cols-2 gap-4 w-full max-w-md">
+                <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-3.5 flex flex-col items-center">
+                    <span class="font-game text-amber-800 text-xs md:text-sm">Stars Earned</span>
+                    <span id="round-stars-display" class="font-game text-2xl md:text-3xl text-amber-600">+0</span>
+                </div>
+                <div class="bg-sky-50 border-2 border-sky-300 rounded-2xl p-3.5 flex flex-col items-center">
+                    <span class="font-game text-sky-800 text-xs md:text-sm">Accuracy Score</span>
+                    <span id="round-score-display" class="font-game text-2xl md:text-3xl text-sky-600">0 / 10</span>
+                </div>
+            </div>
+
+            <!-- WRONG QUESTIONS REVIEW LIST -->
+            <div class="w-full max-w-2xl bg-white/80 border-2 border-slate-200 rounded-2xl p-4 text-left">
+                <h3 class="font-game text-lg text-slate-800 mb-3 flex items-center space-x-2">
+                    <span>📋</span>
+                    <span>Review Mistakes & Learning Points:</span>
+                </h3>
+
+                <div id="wrong-questions-container" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                    <!-- Injected wrong answers list -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+                <button onclick="playNextRoundOrRestart()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-game text-lg py-3 rounded-2xl shadow-lg border-b-4 border-emerald-700 active:scale-95 transition">
+                    Next 10 Questions 🚀
+                </button>
+                <button onclick="showHub()" class="flex-1 bg-sky-500 hover:bg-sky-600 text-white font-game text-lg py-3 rounded-2xl shadow-lg border-b-4 border-sky-700 active:scale-95 transition">
+                    Choose Game 🎮
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full text-center py-3 text-xs font-semibold text-slate-500">
+        G3 Ch.1 Life processes • Primary Science Interactive Explorer
+    </footer>
+
+    <!-- JS & QUESTION BANKS -->
+    <script>
+        /* ================= AUDIO SYNTHESIZER ================= */
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+        let soundEnabled = true;
+        let musicEnabled = false;
+        let musicInterval = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('btn-sound');
+            const icon = document.getElementById('icon-sound');
+            if (soundEnabled) {
+                btn.className = "w-12 h-12 bg-white rounded-full shadow-md border-2 border-emerald-400 flex items-center justify-center text-emerald-600 hover:bg-emerald-50 active:scale-95 transition";
+                icon.className = "fa-solid fa-volume-high text-lg";
+                playChime();
+            } else {
+                btn.className = "w-12 h-12 bg-slate-200 rounded-full shadow-md border-2 border-slate-400 flex items-center justify-center text-slate-500 active:scale-95 transition";
+                icon.className = "fa-solid fa-volume-xmark text-lg";
+            }
+        }
+
+        function toggleMusic() {
+            initAudio();
+            musicEnabled = !musicEnabled;
+            const btn = document.getElementById('btn-music');
+            const icon = document.getElementById('icon-music');
+
+            if (musicEnabled) {
+                btn.className = "w-12 h-12 bg-sky-200 rounded-full shadow-md border-2 border-sky-500 flex items-center justify-center text-sky-700 active:scale-95 transition";
+                icon.className = "fa-solid fa-volume-high text-lg";
+                
+                const bgmNotes = [261.63, 329.63, 392.00, 329.63, 349.23, 440.00, 392.00, 293.66];
+                let idx = 0;
+                musicInterval = setInterval(() => {
+                    if (!musicEnabled) return;
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(bgmNotes[idx], now);
+                    gain.gain.setValueAtTime(0.03, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                    idx = (idx + 1) % bgmNotes.length;
+                }, 450);
+            } else {
+                clearInterval(musicInterval);
+                btn.className = "w-12 h-12 bg-white rounded-full shadow-md border-2 border-sky-400 flex items-center justify-center text-sky-600 hover:bg-sky-50 active:scale-95 transition";
+                icon.className = "fa-solid fa-music text-lg";
+            }
+        }
+
+        function playChime() {
+            if (!soundEnabled) return;
+            initAudio();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.25);
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        }
+
+        function playOops() {
+            if (!soundEnabled) return;
+            initAudio();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, now);
+            osc.frequency.exponentialRampToValueAtTime(110, now + 0.25);
+            gain.gain.setValueAtTime(0.18, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        }
+
+        function playFanfare() {
+            if (!soundEnabled) return;
+            initAudio();
+            const notes = [261.63, 329.63, 392.00, 523.25];
+            notes.forEach((freq, idx) => {
+                const now = audioCtx.currentTime + idx * 0.12;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            });
+        }
+
+        /* ================= ALL QUESTION BANKS (30 per stage) ================= */
+
+        const mcBank = [
+            { id: 'mc_1', q: "What does “nutrition” mean?", options: ["Moving from place to place", "Getting food needed to live and grow", "Making waste", "Sensing sound"], ans: 1 },
+            { id: 'mc_2', q: "Why must animals eat other living things?", options: ["They cannot make their own food", "They do not need food", "They only drink water", "They grow without eating"], ans: 0 },
+            { id: 'mc_3', q: "How do plants usually get their nutrition?", options: ["By eating animals", "By making their own food", "By drinking only water", "By moving around"], ans: 1 },
+            { id: 'mc_4', q: "What happens when a living thing grows?", options: ["It stays the same size forever", "It becomes heavier, bigger or taller", "It stops needing food", "It turns into a non-living thing"], ans: 1 },
+            { id: 'mc_5', q: "A tiny seed becomes a tall sunflower. This shows which life process?", options: ["Excrete", "Grow", "Sense", "Breathe"], ans: 1 },
+            { id: 'mc_6', q: "Why do animals move from place to place?", options: ["To look for food, shelter and to escape danger", "Only to play", "Because they cannot grow", "To make their own food"], ans: 0 },
+            { id: 'mc_7', q: "How do plants “move”?", options: ["They walk on roots", "They grow towards the Sun", "They fly like birds", "They do not move at all"], ans: 1 },
+            { id: 'mc_8', q: "What does “sensing” mean?", options: ["Making food", "Detecting and responding to changes around them", "Removing waste", "Getting bigger"], ans: 1 },
+            { id: 'mc_9', q: "Bats use high-pitched sound waves to…", options: ["Make food", "Avoid obstacles", "Grow taller", "Lay eggs"], ans: 1 },
+            { id: 'mc_10', q: "Plants can sense moisture in the soil so their roots…", options: ["Grow away from water", "Grow toward water", "Stop growing", "Turn into leaves"], ans: 1 },
+            { id: 'mc_11', q: "Breathing means…", options: ["Taking air in and out to get oxygen", "Only eating food", "Only growing", "Making seeds"], ans: 0 },
+            { id: 'mc_12', q: "Which body parts can animals use to take in oxygen?", options: ["Only eyes", "Lungs, gills, skin or spiracles", "Only legs", "Only ears"], ans: 1 },
+            { id: 'mc_13', q: "How do plants get the gases they need?", options: ["They have lungs like animals", "They exchange gases through their leaves and stems", "They do not need any gases", "They only drink water"], ans: 1 },
+            { id: 'mc_14', q: "What is excretion?", options: ["Getting food", "Removing waste materials", "Moving around", "Making babies"], ans: 1 },
+            { id: 'mc_15', q: "Animals get rid of waste by…", options: ["Sweating and urinating", "Growing taller", "Eating more food", "Sleeping"], ans: 0 },
+            { id: 'mc_16', q: "Plants remove extra water and waste gases through…", options: ["Their roots only", "Tiny holes called stomata in their leaves", "Their flowers only", "Their seeds"], ans: 1 },
+            { id: 'mc_17', q: "What does reproduction mean?", options: ["Getting bigger", "Producing offspring (babies or new plants)", "Sensing light", "Removing waste"], ans: 1 },
+            { id: 'mc_18', q: "How do most animals reproduce?", options: ["By making seeds", "By giving birth to live young or laying eggs", "By growing toward the Sun", "By exchanging gases"], ans: 1 },
+            { id: 'mc_19', q: "Plants can reproduce by…", options: ["Seeds, pollen, spores or stems", "Only by walking", "Only by sweating", "Only by eating"], ans: 0 },
+            { id: 'mc_20', q: "A living thing must be able to do how many of the life processes?", options: ["Only 1", "Only 3", "All 7", "None"], ans: 2 },
+            { id: 'mc_21', q: "The Sun moves across the sky. Why is it still non-living?", options: ["It cannot obtain nutrients, grow, sense, breathe, excrete or reproduce", "It is too big", "It is too hot", "It is yellow"], ans: 0 },
+            { id: 'mc_22', q: "Water in a river is moving. Why is it non-living?", options: ["It cannot do the other life processes", "It is wet", "It is cold", "It has no colour"], ans: 0 },
+            { id: 'mc_23', q: "Bacteria are very small. Why are they still living things?", options: ["They can do all 7 life processes", "They are invisible", "They live in water", "They are blue"], ans: 0 },
+            { id: 'mc_24', q: "A rock sits in the same place for many years. Which life process is it missing?", options: ["It is missing almost all of them", "Only moving", "Only growing", "Only sensing"], ans: 0 },
+            { id: 'mc_25', q: "Which statement is true about plants and animals?", options: ["Both can make their own food", "Animals must eat other living things; plants can make their own food", "Plants must eat animals", "Neither needs nutrition"], ans: 1 },
+            { id: 'mc_26', q: "Why is a race car non-living even though it moves fast?", options: ["It cannot obtain nutrients, grow, sense, breathe, excrete or reproduce", "It has wheels", "It is made of metal", "It needs petrol"], ans: 0 },
+            { id: 'mc_27', q: "A baby kangaroo grows inside its mother’s pouch. This shows…", options: ["Nutrition only", "Reproduction and growth", "Only sensing", "Only excretion"], ans: 1 },
+            { id: 'mc_28', q: "Giant kelp can grow very fast. This is an example of which life process?", options: ["Excrete", "Grow", "Sense", "Breathe"], ans: 1 },
+            { id: 'mc_29', q: "When a plant’s roots grow toward water, which two life processes are working together?", options: ["Sense and move (by growing)", "Only breathe", "Only excrete", "Only reproduce"], ans: 0 },
+            { id: 'mc_30', q: "Which of these is the best way to decide if something is living?", options: ["Check if it can do all 7 life processes", "Check only if it moves", "Check only if it is green", "Check only if it is big"], ans: 0 }
+        ];
+
+        const tfBank = [
+            { id: 'tf_1', q: "Nutrition means getting the food needed to live and grow.", ans: true },
+            { id: 'tf_2', q: "Animals can make their own food just like plants.", ans: false },
+            { id: 'tf_3', q: "Plants obtain nutrition by making their own food.", ans: true },
+            { id: 'tf_4', q: "Growing means becoming heavier, bigger or taller.", ans: true },
+            { id: 'tf_5', q: "A living thing stops changing when it gets older.", ans: false },
+            { id: 'tf_6', q: "Animals move only to play, not to find food or escape danger.", ans: false },
+            { id: 'tf_7', q: "Plants can move by growing toward the Sun.", ans: true },
+            { id: 'tf_8', q: "Sensing means detecting and responding to changes around them.", ans: true },
+            { id: 'tf_9', q: "Bats use sound waves to help them sense obstacles.", ans: true },
+            { id: 'tf_10', q: "Plants cannot sense anything in their environment.", ans: false },
+            { id: 'tf_11', q: "Breathing is taking air in and out to get oxygen.", ans: true },
+            { id: 'tf_12', q: "All animals use only lungs to breathe.", ans: false },
+            { id: 'tf_13', q: "Plants exchange gases even though they do not have lungs.", ans: true },
+            { id: 'tf_14', q: "Excretion is the process of removing waste.", ans: true },
+            { id: 'tf_15', q: "Animals never need to get rid of waste.", ans: false },
+            { id: 'tf_16', q: "Plants get rid of extra water through stomata.", ans: true },
+            { id: 'tf_17', q: "Reproduction means producing offspring.", ans: true },
+            { id: 'tf_18', q: "Animals can only lay eggs; they never give birth to live young.", ans: false },
+            { id: 'tf_19', q: "Plants can reproduce using seeds, pollen, spores or stems.", ans: true },
+            { id: 'tf_20', q: "A living thing must be able to do all 7 life processes.", ans: true },
+            { id: 'tf_21', q: "The Sun is living because it moves.", ans: false },
+            { id: 'tf_22', q: "Water is living because it can move in a river.", ans: false },
+            { id: 'tf_23', q: "Bacteria are living things.", ans: true },
+            { id: 'tf_24', q: "A rock is living because it can stay in one place for a long time.", ans: false },
+            { id: 'tf_25', q: "If something can only move but cannot do the other life processes, it is non-living.", ans: true },
+            { id: 'tf_26', q: "Plants and animals both need to obtain nutrition.", ans: true },
+            { id: 'tf_27', q: "Growing is only for animals, not for plants.", ans: false },
+            { id: 'tf_28', q: "Sensing helps living things respond to their environment.", ans: true },
+            { id: 'tf_29', q: "A cow can do all 7 life processes.", ans: true },
+            { id: 'tf_30', q: "Non-living things are unable to perform one or more of the life processes.", ans: true }
+        ];
+
+        const sortBankLiving = [
+            "Sunflower 🌻", "Tree 🌳", "Cow 🐮", "Bacteria 🧫", "Fish 🐟", 
+            "Bamboo 🎋", "Kelp 🌿", "Bird 🐦", "Kangaroo 🦘", "Chicken 🐔", 
+            "Rabbit 🐰", "Dog 🐶", "Frog 🐸", "Caterpillar 🐛", "Bat 🦇", 
+            "Ocean Sunfish 🐠", "Grass 🌱", "Flower 🌸", "Growing Seed 🌰", "Human 🧑", 
+            "Ant 🐜", "Bee 🐝", "Worm 🪱", "Mushroom 🍄", "Moss ☘️"
+        ];
+
+        const sortBankNonLiving = [
+            "The Sun ☀️", "Rock 🪨", "Water 💧", "Race Car 🏎️", "Vacuum Cleaner 🧹", 
+            "Pasta 🍝", "Table 🪵", "Chair 🪑", "Car 🚗", "Bike 🚲", 
+            "Book 📖", "Pencil ✏️", "Phone 📱", "Computer 💻", "Cloud ☁️", 
+            "Rain 🌧️", "Mountain ⛰️", "Sand 🏜️", "Glass 🥛", "Plastic Bottle 🍾", 
+            "Metal Spoon 🥄", "Shoe 👟", "Bag 🎒", "Ball ⚽", "Light Bulb 💡"
+        ];
+
+        const blankBank = [
+            { id: 'bl_1', template: "Living things obtain ________ to survive and grow.", correct: "nutrition", options: ["nutrition", "toys", "pencils"] },
+            { id: 'bl_2', template: "Animals cannot make their own food, so they must ________ other living things.", correct: "eat", options: ["eat", "paint", "sleep"] },
+            { id: 'bl_3', template: "Plants can make their own ________.", correct: "food", options: ["food", "bicycles", "clothes"] },
+            { id: 'bl_4', template: "Growing is the process of becoming heavier, bigger or ________.", correct: "taller", options: ["taller", "smaller", "colder"] },
+            { id: 'bl_5', template: "Animals start small and get bigger and ________ as they eat food.", correct: "stronger", options: ["stronger", "softer", "darker"] },
+            { id: 'bl_6', template: "Plants start as tiny ________ planted in the soil.", correct: "seeds", options: ["seeds", "rocks", "shoes"] },
+            { id: 'bl_7', template: "Moving is the process of changing ________.", correct: "position", options: ["position", "color", "name"] },
+            { id: 'bl_8', template: "Animals move to look for food, shelter and to escape from ________.", correct: "danger", options: ["danger", "water", "sunlight"] },
+            { id: 'bl_9', template: "Plants move by growing toward the ________.", correct: "Sun", options: ["Sun", "Moon", "Wind"] },
+            { id: 'bl_10', template: "Sensing is the process of detecting and ________ to changes.", correct: "responding", options: ["responding", "sleeping", "hiding"] },
+            { id: 'bl_11', template: "Bats emit high-pitched sound waves to avoid ________.", correct: "obstacles", options: ["obstacles", "air", "food"] },
+            { id: 'bl_12', template: "Plants can sense moisture and grow roots toward ________.", correct: "water", options: ["water", "fire", "rocks"] },
+            { id: 'bl_13', template: "Breathing is the process of taking ________ into and out of the body.", correct: "air", options: ["air", "sand", "milk"] },
+            { id: 'bl_14', template: "Animals may use lungs, gills, skin or ________ to take in oxygen.", correct: "spiracles", options: ["spiracles", "feathers", "tails"] },
+            { id: 'bl_15', template: "Plants exchange ________ to survive.", correct: "gases", options: ["gases", "toys", "stones"] },
+            { id: 'bl_16', template: "Excretion is the process of removing ________ materials.", correct: "waste", options: ["waste", "clean", "fresh"] },
+            { id: 'bl_17', template: "Animals get rid of waste by sweating and ________.", correct: "urinating", options: ["urinating", "flying", "jumping"] },
+            { id: 'bl_18', template: "Plants get rid of extra water through tiny holes called ________.", correct: "stomata", options: ["stomata", "roots", "petals"] },
+            { id: 'bl_19', template: "Reproduction is the process by which living things produce ________.", correct: "offspring", options: ["offspring", "rocks", "clouds"] },
+            { id: 'bl_20', template: "Animals give birth to live young or lay ________.", correct: "eggs", options: ["eggs", "seeds", "leaves"] },
+            { id: 'bl_21', template: "Plants can reproduce by seeds, pollen, spores or ________.", correct: "stems", options: ["stems", "legs", "wings"] },
+            { id: 'bl_22', template: "Living things must be able to do all ________ life processes.", correct: "7", options: ["7", "2", "10"] },
+            { id: 'bl_23', template: "The Sun is non-living because it cannot obtain nutrients, grow, sense, breathe, excrete or ________.", correct: "reproduce", options: ["reproduce", "shine", "move"] },
+            { id: 'bl_24', template: "Water can move, but it is still ________ because it cannot do the other life processes.", correct: "non-living", options: ["non-living", "living", "breathing"] },
+            { id: 'bl_25', template: "Bacteria are ________ things because they can perform all 7 life processes.", correct: "living", options: ["living", "non-living", "robotic"] },
+            { id: 'bl_26', template: "A rock is ________ because it cannot grow, sense, breathe, excrete or reproduce.", correct: "non-living", options: ["non-living", "living", "sleeping"] },
+            { id: 'bl_27', template: "Non-living things are unable to perform one or more ________ processes.", correct: "life", options: ["life", "toy", "car"] },
+            { id: 'bl_28', template: "When a plant’s roots grow toward water, it is showing both sensing and ________.", correct: "moving", options: ["moving", "eating", "sleeping"] },
+            { id: 'bl_29', template: "A living thing that can perform all 7 processes is called a ________ thing.", correct: "living", options: ["living", "non-living", "wooden"] },
+            { id: 'bl_30', template: "The seven life processes help us decide whether something is living or ________.", correct: "non-living", options: ["non-living", "green", "large"] }
+        ];
+
+        /* ================= GAME STATE & QUESTION SELECTION ================= */
+        let totalStars = 0;
+        let activeGameMode = null; // 'mc', 'tf', 'sort', 'blank'
+
+        let currentActiveQuestions = []; // 10 questions for current round
+        let currentQuestionIdx = 0;
+        let currentRoundStars = 0;
+        let correctCount = 0;
+        let wrongList = []; // Tracks wrong answers for review screen
+
+        // Non-repeating tracker state
+        let usedQuestionsMap = {
+            mc: [],
+            tf: [],
+            blank: []
+        };
+
+        function getNonRepeatingBatch(bankKey, fullBank, size = 10) {
+            let usedIds = usedQuestionsMap[bankKey] || [];
+
+            let unused = fullBank.filter(q => !usedIds.includes(q.id));
+
+            if (unused.length < size) {
+                usedQuestionsMap[bankKey] = [];
+                unused = [...fullBank];
+            }
+
+            const shuffled = [...unused].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, size);
+
+            selected.forEach(q => usedQuestionsMap[bankKey].push(q.id));
+
+            return selected;
+        }
+
+        function showHub() {
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-celebrate').classList.add('hidden');
+            document.getElementById('screen-hub').classList.remove('hidden');
+            activeGameMode = null;
+        }
+
+        function updateStarDisplay() {
+            document.getElementById('star-count').innerText = totalStars;
+        }
+
+        function updateProgressBar(current, total) {
+            const pct = Math.round((current / total) * 100);
+            document.getElementById('game-progress-bar').style.width = `${pct}%`;
+            document.getElementById('question-tracker').innerText = `${current} / ${total}`;
+        }
+
+        /* ================= GAME 1: MULTIPLE CHOICE ================= */
+        let mcHadWrongAttempt = false;
+
+        function startQuizGame() {
+            activeGameMode = 'mc';
+            currentQuestionIdx = 0;
+            currentRoundStars = 0;
+            correctCount = 0;
+            wrongList = [];
+
+            currentActiveQuestions = getNonRepeatingBatch('mc', mcBank, 10);
+
+            document.getElementById('screen-hub').classList.add('hidden');
+            document.getElementById('screen-celebrate').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+            document.getElementById('game-title-badge').innerText = "Quiz Mode";
+            document.getElementById('game-title-badge').className = "bg-amber-500 text-white font-game text-xs md:text-sm px-3 py-1 rounded-full shadow";
+
+            hideAllGameViews();
+            document.getElementById('game-mc-view').classList.remove('hidden');
+
+            loadMCQuestion();
+        }
+
+        function loadMCQuestion() {
+            const q = currentActiveQuestions[currentQuestionIdx];
+            updateProgressBar(currentQuestionIdx + 1, 10);
+
+            document.getElementById('mc-question-text').innerText = `${currentQuestionIdx + 1}. ${q.q}`;
+            document.getElementById('mc-feedback-area').classList.add('hidden');
+
+            const grid = document.getElementById('mc-options-grid');
+            grid.innerHTML = '';
+
+            const prefixes = ['A', 'B', 'C', 'D'];
+            mcHadWrongAttempt = false;
+
+            q.options.forEach((optText, i) => {
+                const btn = document.createElement('button');
+                btn.className = `bg-white/90 hover:bg-white border-2 border-slate-300 hover:border-amber-400 text-slate-800 font-bold text-base md:text-lg p-4 rounded-2xl shadow-sm hover:shadow-md active:scale-98 transition flex items-center space-x-3 w-full text-left`;
+                btn.onclick = () => checkMCAnswer(i, btn);
+                btn.innerHTML = `
+                    <span class="bg-amber-100 text-amber-900 border border-amber-300 font-game px-3 py-1 rounded-xl text-sm">${prefixes[i]}</span>
+                    <span class="text-slate-800 font-semibold">${optText}</span>
+                `;
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkMCAnswer(selectedIdx, btnElement) {
+            const q = currentActiveQuestions[currentQuestionIdx];
+            const feedbackArea = document.getElementById('mc-feedback-area');
+            const nextBtn = document.getElementById('btn-mc-next');
+
+            if (selectedIdx === q.ans) {
+                playChime();
+                btnElement.className = "bg-emerald-100 border-2 border-emerald-500 text-emerald-950 font-bold text-base md:text-lg p-4 rounded-2xl shadow-md flex items-center space-x-3 w-full text-left ring-2 ring-emerald-400 animate-pop";
+                
+                disableContainerButtons('mc-options-grid');
+
+                if (!mcHadWrongAttempt) {
+                    totalStars++;
+                    currentRoundStars++;
+                    correctCount++;
+                    updateStarDisplay();
+                }
+
+                feedbackArea.classList.remove('hidden');
+                feedbackArea.classList.add('flex');
+
+                if (currentQuestionIdx === 9) {
+                    nextBtn.innerHTML = `<span>Finish Stage</span> <i class="fa-solid fa-trophy"></i>`;
+                } else {
+                    nextBtn.innerHTML = `<span>Next Question</span> <i class="fa-solid fa-arrow-right"></i>`;
+                }
+            } else {
+                playOops();
+                btnElement.disabled = true;
+                btnElement.className = "bg-rose-50 border-2 border-rose-300 opacity-40 text-rose-800 font-bold text-base md:text-lg p-4 rounded-2xl flex items-center space-x-3 w-full text-left cursor-not-allowed transition duration-300 animate-wiggle";
+
+                if (!mcHadWrongAttempt) {
+                    mcHadWrongAttempt = true;
+                    wrongList.push({
+                        prompt: q.q,
+                        userChoice: q.options[selectedIdx],
+                        correctChoice: q.options[q.ans]
+                    });
+                }
+            }
+        }
+
+        function nextMCQuestion() {
+            currentQuestionIdx++;
+            if (currentQuestionIdx < 10) {
+                loadMCQuestion();
+            } else {
+                triggerCelebration();
+            }
+        }
+
+        /* ================= GAME 2: TRUE / FALSE ================= */
+
+        function startTFGame() {
+            activeGameMode = 'tf';
+            currentQuestionIdx = 0;
+            currentRoundStars = 0;
+            correctCount = 0;
+            wrongList = [];
+
+            currentActiveQuestions = getNonRepeatingBatch('tf', tfBank, 10);
+
+            document.getElementById('screen-hub').classList.add('hidden');
+            document.getElementById('screen-celebrate').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+            document.getElementById('game-title-badge').innerText = "True / False";
+            document.getElementById('game-title-badge').className = "bg-emerald-500 text-white font-game text-xs md:text-sm px-3 py-1 rounded-full shadow";
+
+            hideAllGameViews();
+            document.getElementById('game-tf-view').classList.remove('hidden');
+
+            loadTFQuestion();
+        }
+
+        function loadTFQuestion() {
+            const q = currentActiveQuestions[currentQuestionIdx];
+            updateProgressBar(currentQuestionIdx + 1, 10);
+
+            document.getElementById('tf-question-text').innerText = `"${q.q}"`;
+            document.getElementById('tf-feedback-area').classList.add('hidden');
+
+            const btnTrue = document.getElementById('btn-tf-true');
+            const btnFalse = document.getElementById('btn-tf-false');
+            const badgeTrue = document.getElementById('badge-tf-true');
+            const badgeFalse = document.getElementById('badge-tf-false');
+
+            btnTrue.disabled = false;
+            btnFalse.disabled = false;
+
+            badgeTrue.classList.add('hidden');
+            badgeFalse.classList.add('hidden');
+
+            btnTrue.className = "bg-emerald-500 hover:bg-emerald-600 text-white font-game text-2xl md:text-3xl py-8 rounded-3xl shadow-lg border-b-8 border-emerald-700 active:scale-95 transition flex flex-col items-center justify-center space-y-2 relative overflow-hidden opacity-100";
+            btnFalse.className = "bg-rose-500 hover:bg-rose-600 text-white font-game text-2xl md:text-3xl py-8 rounded-3xl shadow-lg border-b-8 border-rose-700 active:scale-95 transition flex flex-col items-center justify-center space-y-2 relative overflow-hidden opacity-100";
+        }
+
+        function checkTFAnswer(userAns) {
+            const q = currentActiveQuestions[currentQuestionIdx];
+            const feedbackArea = document.getElementById('tf-feedback-area');
+            const nextBtn = document.getElementById('btn-tf-next');
+
+            const btnTrue = document.getElementById('btn-tf-true');
+            const btnFalse = document.getElementById('btn-tf-false');
+            const badgeTrue = document.getElementById('badge-tf-true');
+            const badgeFalse = document.getElementById('badge-tf-false');
+
+            btnTrue.disabled = true;
+            btnFalse.disabled = true;
+
+            const isCorrect = (userAns === q.ans);
+
+            if (userAns === true) {
+                if (isCorrect) {
+                    badgeTrue.innerText = "✓";
+                    badgeTrue.className = "text-xl font-bold bg-white text-emerald-600 px-3 py-0.5 rounded-full shadow animate-pop";
+                    badgeTrue.classList.remove('hidden');
+                    btnFalse.classList.add('opacity-20');
+                } else {
+                    badgeTrue.innerText = "✗";
+                    badgeTrue.className = "text-xl font-bold bg-white text-rose-600 px-3 py-0.5 rounded-full shadow animate-pop";
+                    badgeTrue.classList.remove('hidden');
+
+                    badgeFalse.innerText = "✓";
+                    badgeFalse.className = "text-xl font-bold bg-white text-emerald-600 px-3 py-0.5 rounded-full shadow";
+                    badgeFalse.classList.remove('hidden');
+
+                    btnTrue.classList.add('opacity-30');
+                }
+            } else {
+                if (isCorrect) {
+                    badgeFalse.innerText = "✓";
+                    badgeFalse.className = "text-xl font-bold bg-white text-emerald-600 px-3 py-0.5 rounded-full shadow animate-pop";
+                    badgeFalse.classList.remove('hidden');
+                    btnTrue.classList.add('opacity-20');
+                } else {
+                    badgeFalse.innerText = "✗";
+                    badgeFalse.className = "text-xl font-bold bg-white text-rose-600 px-3 py-0.5 rounded-full shadow animate-pop";
+                    badgeFalse.classList.remove('hidden');
+
+                    badgeTrue.innerText = "✓";
+                    badgeTrue.className = "text-xl font-bold bg-white text-emerald-600 px-3 py-0.5 rounded-full shadow";
+                    badgeTrue.classList.remove('hidden');
+
+                    btnFalse.classList.add('opacity-30');
+                }
+            }
+
+            if (isCorrect) {
+                playChime();
+                totalStars++;
+                currentRoundStars++;
+                correctCount++;
+                updateStarDisplay();
+            } else {
+                playOops();
+                wrongList.push({
+                    prompt: q.q,
+                    userChoice: userAns ? "TRUE" : "FALSE",
+                    correctChoice: q.ans ? "TRUE" : "FALSE"
+                });
+            }
+
+            feedbackArea.classList.remove('hidden');
+            feedbackArea.classList.add('flex');
+
+            if (currentQuestionIdx === 9) {
+                nextBtn.innerHTML = `<span>Finish Stage</span> <i class="fa-solid fa-trophy"></i>`;
+            } else {
+                nextBtn.innerHTML = `<span>Next Question</span> <i class="fa-solid fa-arrow-right"></i>`;
+            }
+        }
+
+        function nextTFQuestion() {
+            currentQuestionIdx++;
+            if (currentQuestionIdx < 10) {
+                loadTFQuestion();
+            } else {
+                triggerCelebration();
+            }
+        }
+
+        /* ================= GAME 3: SORT INTO BOXES ================= */
+        let sortItemsState = [];
+        let selectedSortCard = null;
+
+        function startSortGame() {
+            activeGameMode = 'sort';
+            currentRoundStars = 0;
+            correctCount = 0;
+            wrongList = [];
+            selectedSortCard = null;
+
+            document.getElementById('screen-hub').classList.add('hidden');
+            document.getElementById('screen-celebrate').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+            document.getElementById('game-title-badge').innerText = "Sort into Boxes";
+            document.getElementById('game-title-badge').className = "bg-sky-500 text-white font-game text-xs md:text-sm px-3 py-1 rounded-full shadow";
+
+            hideAllGameViews();
+            document.getElementById('game-sort-view').classList.remove('hidden');
+
+            const shuffledLiving = [...sortBankLiving].sort(() => Math.random() - 0.5).slice(0, 5);
+            const shuffledNonLiving = [...sortBankNonLiving].sort(() => Math.random() - 0.5).slice(0, 5);
+
+            sortItemsState = [
+                ...shuffledLiving.map((item, idx) => ({ id: `l_${idx}`, name: item, type: 'living', placedZone: null })),
+                ...shuffledNonLiving.map((item, idx) => ({ id: `nl_${idx}`, name: item, type: 'nonliving', placedZone: null }))
+            ].sort(() => Math.random() - 0.5);
+
+            updateSortUI();
+        }
+
+        function updateSortUI() {
+            const pool = document.getElementById('sort-card-pool');
+            pool.innerHTML = '';
+
+            const unplaced = sortItemsState.filter(i => i.placedZone === null);
+
+            unplaced.forEach(item => {
+                const card = document.createElement('div');
+                card.id = `card_${item.id}`;
+                card.draggable = true;
+                card.ondragstart = (e) => handleSortDragStart(e, item.id);
+                card.onclick = () => selectSortCard(item.id);
+
+                const isSelected = selectedSortCard === item.id;
+                card.className = `cursor-pointer bg-white border-2 ${isSelected ? 'border-sky-500 ring-4 ring-sky-300 scale-105' : 'border-slate-300 hover:border-sky-400'} rounded-2xl px-4 py-2 font-game text-sm md:text-base text-slate-800 shadow-md transition active:scale-95 flex items-center space-x-2`;
+
+                card.innerHTML = `<span>${item.name}</span>`;
+                pool.appendChild(card);
+            });
+
+            renderSortZones();
+
+            const sortedCount = sortItemsState.filter(i => i.placedZone !== null).length;
+            document.getElementById('sort-progress-text').innerText = `${sortedCount} / 10`;
+            updateProgressBar(sortedCount, 10);
+
+            const checkBtn = document.getElementById('btn-sort-check');
+            const nextBtn = document.getElementById('btn-sort-next');
+
+            if (sortedCount === 10) {
+                checkBtn.classList.remove('hidden');
+            } else {
+                checkBtn.classList.add('hidden');
+            }
+            nextBtn.classList.add('hidden');
+        }
+
+        function selectSortCard(id) {
+            selectedSortCard = (selectedSortCard === id) ? null : id;
+            updateSortUI();
+        }
+
+        function handleZoneTap(zone) {
+            if (selectedSortCard) {
+                const item = sortItemsState.find(i => i.id === selectedSortCard);
+                if (item) {
+                    item.placedZone = zone;
+                    selectedSortCard = null;
+                    playChime();
+                    updateSortUI();
+                }
+            }
+        }
+
+        function handleSortDragStart(e, id) {
+            e.dataTransfer.setData('text/plain', id);
+        }
+
+        function allowSortDrop(e) {
+            e.preventDefault();
+        }
+
+        function handleSortDrop(e, zone) {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text/plain');
+            const item = sortItemsState.find(i => i.id === id);
+            if (item) {
+                item.placedZone = zone;
+                playChime();
+                updateSortUI();
+            }
+        }
+
+        function removeSortItem(id, event) {
+            event.stopPropagation();
+            const item = sortItemsState.find(i => i.id === id);
+            if (item) {
+                item.placedZone = null;
+                updateSortUI();
+            }
+        }
+
+        function renderSortZones(checkChecked = false) {
+            ['living', 'nonliving'].forEach(zone => {
+                const list = document.getElementById(`${zone}-box-list`);
+                list.innerHTML = '';
+                sortItemsState.filter(i => i.placedZone === zone).forEach(item => {
+                    const tag = document.createElement('div');
+                    const isWrong = checkChecked && (item.placedZone !== item.type);
+                    const isCorrect = checkChecked && (item.placedZone === item.type);
+
+                    if (isWrong) {
+                        tag.className = 'bg-rose-100 border-2 border-rose-500 text-rose-900 font-bold rounded-xl px-3 py-1 font-game text-xs md:text-sm flex items-center space-x-2 shadow-sm animate-wiggle';
+                    } else if (isCorrect) {
+                        tag.className = 'bg-emerald-100 border-2 border-emerald-500 text-emerald-900 font-bold rounded-xl px-3 py-1 font-game text-xs md:text-sm flex items-center space-x-2 shadow-sm animate-pop';
+                    } else {
+                        tag.className = 'bg-white border border-slate-300 rounded-xl px-3 py-1 font-game text-xs md:text-sm flex items-center space-x-2 shadow-sm animate-pop';
+                    }
+
+                    tag.innerHTML = `
+                        <span>${item.name}</span>
+                        ${!checkChecked ? `
+                        <button onclick="removeSortItem('${item.id}', event)" class="text-rose-500 hover:text-rose-700 ml-1">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>` : ''}
+                    `;
+                    list.appendChild(tag);
+                });
+            });
+        }
+
+        function checkSortRound() {
+            let correct = 0;
+            wrongList = [];
+
+            sortItemsState.forEach(item => {
+                if (item.placedZone === item.type) {
+                    correct++;
+                } else {
+                    wrongList.push({
+                        prompt: `Sorting: "${item.name}"`,
+                        userChoice: item.placedZone === 'living' ? 'Living Box' : 'Non-Living Box',
+                        correctChoice: item.type === 'living' ? 'Living Box' : 'Non-Living Box'
+                    });
+                }
+            });
+
+            correctCount = correct;
+            document.getElementById('btn-sort-check').classList.add('hidden');
+
+            if (correct === 10) {
+                playFanfare();
+                totalStars += 3;
+                currentRoundStars += 3;
+                updateStarDisplay();
+            } else {
+                playOops();
+                totalStars += 1;
+                currentRoundStars += 1;
+                updateStarDisplay();
+            }
+
+            renderSortZones(true);
+            document.getElementById('btn-sort-next').classList.remove('hidden');
+        }
+
+        /* ================= GAME 4: FILL IN THE BLANK ================= */
+        let blankHadWrongAttempt = false;
+
+        function startBlankGame() {
+            activeGameMode = 'blank';
+            currentQuestionIdx = 0;
+            currentRoundStars = 0;
+            correctCount = 0;
+            wrongList = [];
+
+            currentActiveQuestions = getNonRepeatingBatch('blank', blankBank, 10);
+
+            document.getElementById('screen-hub').classList.add('hidden');
+            document.getElementById('screen-celebrate').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+            document.getElementById('game-title-badge').innerText = "Fill-in-the-Blank";
+            document.getElementById('game-title-badge').className = "bg-purple-500 text-white font-game text-xs md:text-sm px-3 py-1 rounded-full shadow";
+
+            hideAllGameViews();
+            document.getElementById('game-blank-view').classList.remove('hidden');
+
+            loadBlankQuestion();
+        }
+
+        function loadBlankQuestion() {
+            const q = currentActiveQuestions[currentQuestionIdx];
+            updateProgressBar(currentQuestionIdx + 1, 10);
+
+            document.getElementById('blank-feedback-area').classList.add('hidden');
+
+            const sentenceBox = document.getElementById('blank-sentence-box');
+            sentenceBox.innerHTML = q.template.replace('________', `<span id="blank-target-slot" class="inline-block px-4 py-1 bg-amber-200 border-b-4 border-amber-500 rounded-xl text-amber-900 underline min-w-[120px]">???</span>`);
+
+            const bank = document.getElementById('blank-word-bank');
+            bank.innerHTML = '';
+
+            const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+            blankHadWrongAttempt = false;
+
+            shuffled.forEach(word => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white/90 hover:bg-white border-2 border-purple-300 hover:border-purple-500 text-purple-900 font-game text-lg md:text-xl px-6 py-3 rounded-2xl shadow-sm hover:shadow-md active:scale-95 transition";
+                btn.innerText = word;
+                btn.onclick = () => checkBlankAnswer(word, q, btn);
+                bank.appendChild(btn);
+            });
+        }
+
+        function checkBlankAnswer(selectedWord, qObj, btnElement) {
+            const slot = document.getElementById('blank-target-slot');
+            const feedbackArea = document.getElementById('blank-feedback-area');
+            const nextBtn = document.getElementById('btn-blank-next');
+
+            slot.innerText = selectedWord;
+
+            if (selectedWord === qObj.correct) {
+                playChime();
+                slot.className = "inline-block px-4 py-1 bg-emerald-200 border-b-4 border-emerald-500 rounded-xl text-emerald-900 min-w-[120px] animate-pop";
+                
+                disableContainerButtons('blank-word-bank');
+
+                if (!blankHadWrongAttempt) {
+                    totalStars++;
+                    currentRoundStars++;
+                    correctCount++;
+                    updateStarDisplay();
+                }
+
+                feedbackArea.classList.remove('hidden');
+                feedbackArea.classList.add('flex');
+
+                if (currentQuestionIdx === 9) {
+                    nextBtn.innerHTML = `<span>Finish Stage</span> <i class="fa-solid fa-trophy"></i>`;
+                } else {
+                    nextBtn.innerHTML = `<span>Next Question</span> <i class="fa-solid fa-arrow-right"></i>`;
+                }
+            } else {
+                playOops();
+                slot.className = "inline-block px-4 py-1 bg-rose-200 border-b-4 border-rose-500 rounded-xl text-rose-900 min-w-[120px] animate-wiggle";
+
+                btnElement.disabled = true;
+                btnElement.className = "bg-rose-50 border-2 border-rose-300 opacity-40 text-rose-800 font-game text-lg md:text-xl px-6 py-3 rounded-2xl cursor-not-allowed transition duration-300 animate-wiggle";
+
+                if (!blankHadWrongAttempt) {
+                    blankHadWrongAttempt = true;
+                    wrongList.push({
+                        prompt: qObj.template,
+                        userChoice: selectedWord,
+                        correctChoice: qObj.correct
+                    });
+                }
+            }
+        }
+
+        function nextBlankQuestion() {
+            currentQuestionIdx++;
+            if (currentQuestionIdx < 10) {
+                loadBlankQuestion();
+            } else {
+                triggerCelebration();
+            }
+        }
+
+        /* ================= UTILITY & CELEBRATION / SUMMARY ================= */
+
+        function hideAllGameViews() {
+            document.getElementById('game-mc-view').classList.add('hidden');
+            document.getElementById('game-tf-view').classList.add('hidden');
+            document.getElementById('game-sort-view').classList.add('hidden');
+            document.getElementById('game-blank-view').classList.add('hidden');
+        }
+
+        function disableContainerButtons(containerId) {
+            const btns = document.getElementById(containerId).getElementsByTagName('button');
+            for (let btn of btns) {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function triggerCelebration() {
+            playFanfare();
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-celebrate').classList.remove('hidden');
+
+            document.getElementById('round-stars-display').innerText = `+${currentRoundStars} Stars`;
+            document.getElementById('round-score-display').innerText = `${correctCount} / 10`;
+
+            const wrongContainer = document.getElementById('wrong-questions-container');
+            wrongContainer.innerHTML = '';
+
+            if (wrongList.length === 0) {
+                wrongContainer.innerHTML = `
+                    <div class="bg-emerald-50 border-2 border-emerald-300 rounded-xl p-4 text-center text-emerald-900 font-bold">
+                        🌟 Perfect Score! You got 100% correct without any mistakes! Super Science Master! 🎉
+                    </div>
+                `;
+            } else {
+                wrongList.forEach((item, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'bg-rose-50 border border-rose-200 rounded-xl p-3 text-xs md:text-sm space-y-1';
+                    row.innerHTML = `
+                        <div class="font-bold text-slate-800">${idx + 1}. ${item.prompt}</div>
+                        <div class="flex flex-wrap gap-x-4 text-slate-600">
+                            <span class="text-rose-700">❌ Your Choice: <strong>${item.userChoice}</strong></span>
+                            <span class="text-emerald-700">✅ Correct Answer: <strong>${item.correctChoice}</strong></span>
+                        </div>
+                    `;
+                    wrongContainer.appendChild(row);
+                });
+            }
+
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        function playNextRoundOrRestart() {
+            if (activeGameMode === 'mc') startQuizGame();
+            else if (activeGameMode === 'tf') startTFGame();
+            else if (activeGameMode === 'sort') startSortGame();
+            else if (activeGameMode === 'blank') startBlankGame();
+            else showHub();
+        }
+    </script>
+</body>
+</html>
